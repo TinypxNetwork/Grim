@@ -23,4 +23,9 @@ public class ForgeOfflinePlatformPlayer implements OfflinePlatformPlayer {
     public @NotNull String getName() {
         return name;
     }
+
+    @Override
+    public boolean isOnline() {
+        return false;
+    }
 }

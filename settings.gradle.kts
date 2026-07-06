@@ -53,7 +53,7 @@ pluginManagement {
 }
 
 plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
     id("com.gradle.develocity") version "4.2.1" apply false
 }
 
@@ -84,19 +84,34 @@ if (gradle.startParameter.isBuildScan) {
 
 rootProject.name = "grimac"
 include("common")
-include("bukkit")
-include("fabric")
 include("forge")
 include(":forge:shared")
 include(":forge:mc1201")
-include(":fabric:shared")
-include(":fabric:intermediary")
-include(":fabric:intermediary:mc1161")
-include(":fabric:intermediary:mc1171")
-include(":fabric:intermediary:mc1194")
-include(":fabric:intermediary:mc1205")
-include(":fabric:intermediary:mc12111")
-include(":fabric:official")
-include(":fabric:official:mc261")
+
+val includeBukkit = providers.gradleProperty("includeBukkit")
+    .map(String::toBoolean)
+    .orElse(false)
+    .get()
+val includeFabric = providers.gradleProperty("includeFabric")
+    .map(String::toBoolean)
+    .orElse(false)
+    .get()
+
+if (includeBukkit) {
+    include("bukkit")
+}
+
+if (includeFabric) {
+    include("fabric")
+    include(":fabric:shared")
+    include(":fabric:intermediary")
+    include(":fabric:intermediary:mc1161")
+    include(":fabric:intermediary:mc1171")
+    include(":fabric:intermediary:mc1194")
+    include(":fabric:intermediary:mc1205")
+    include(":fabric:intermediary:mc12111")
+    include(":fabric:official")
+    include(":fabric:official:mc261")
+}
 
 if (file("workspace.gradle.kts").exists()) apply(from = "workspace.gradle.kts")

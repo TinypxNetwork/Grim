@@ -5,38 +5,65 @@ import ac.grim.grimac.platform.api.scheduler.AsyncScheduler;
 import ac.grim.grimac.platform.api.scheduler.TaskHandle;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 public class ForgeAsyncScheduler implements AsyncScheduler {
     private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(4);
-    private final ConcurrentHashMap<ScheduledFuture<?>, Runnable> cancellationCallbacks = new ConcurrentHashMap<>();
+    private final ConcurrentMap<GrimPlugin, List<Future<?>>> pluginTasks = new ConcurrentHashMap<>();
 
     @Override
-    public TaskHandle runNow(@NotNull GrimPlugin plugin, @NotNull Consumer<Object> task) {
-        CompletableFuture<Void> future = CompletableFuture.runAsync(() -> task.accept(null), executor);
-        return () -> future.cancel(false);
+    public TaskHandle runNow(@NotNull GrimPlugin plugin, @NotNull Runnable task) {
+        CompletableFuture<Void> future = CompletableFuture.runAsync(task, executor);
+        trackFuture(plugin, future);
+        return ForgePlatformScheduler.createTaskHandle(false, future::isCancelled, () -> future.cancel(false));
     }
 
     @Override
-    public TaskHandle runDelayed(@NotNull GrimPlugin plugin, @NotNull Consumer<Object> task, long delay) {
-        ScheduledFuture<?> future = executor.schedule(() -> task.accept(null), delay, TimeUnit.MILLISECONDS);
-        return () -> future.cancel(false);
+    public TaskHandle runDelayed(@NotNull GrimPlugin plugin, @NotNull Runnable task, long delay, @NotNull TimeUnit timeUnit) {
+        ScheduledFuture<?> future = executor.schedule(task, delay, timeUnit);
+        trackFuture(plugin, future);
+        return ForgePlatformScheduler.createTaskHandle(false, future::isCancelled, () -> future.cancel(false));
     }
 
     @Override
-    public TaskHandle runAtFixedRate(@NotNull GrimPlugin plugin, @NotNull Consumer<Object> task, long initialDelay, long period) {
-        ScheduledFuture<?> future = executor.scheduleAtFixedRate(() -> task.accept(null), initialDelay, period, TimeUnit.MILLISECONDS);
-        return () -> future.cancel(false);
+    public TaskHandle runAtFixedRate(@NotNull GrimPlugin plugin, @NotNull Runnable task, long delay, long period, @NotNull TimeUnit timeUnit) {
+        ScheduledFuture<?> future = executor.scheduleAtFixedRate(task, delay, period, timeUnit);
+        trackFuture(plugin, future);
+        return ForgePlatformScheduler.createTaskHandle(false, future::isCancelled, () -> future.cancel(false));
+    }
+
+    @Override
+    public TaskHandle runAtFixedRate(@NotNull GrimPlugin plugin, @NotNull Runnable task, long initialDelayTicks, long periodTicks) {
+        return runAtFixedRate(plugin, task, initialDelayTicks * 50L, periodTicks * 50L, TimeUnit.MILLISECONDS);
+    }
+
+    @Override
+    public void cancel(@NotNull GrimPlugin plugin) {
+        List<Future<?>> futures = pluginTasks.remove(plugin);
+        if (futures != null) {
+            for (Future<?> future : futures) {
+                future.cancel(false);
+            }
+        }
     }
 
     public void cancelAll() {
+        for (GrimPlugin plugin : pluginTasks.keySet()) {
+            cancel(plugin);
+        }
         executor.shutdownNow();
-        ForgePlatformScheduler.cancelAllTasks(cancellationCallbacks);
+    }
+
+    private void trackFuture(GrimPlugin plugin, Future<?> future) {
+        pluginTasks.computeIfAbsent(plugin, k -> new ArrayList<>()).add(future);
     }
 }

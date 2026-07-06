@@ -9,7 +9,7 @@ import ac.grim.grimac.platform.api.PlatformLoader;
 import ac.grim.grimac.platform.forge.resolver.ForgeResolverRegistrar;
 import ac.grim.grimac.platform.api.PlatformServer;
 import ac.grim.grimac.platform.api.command.CommandService;
-import ac.grim.grimac.platform.api.manager.CloudPlatformCommandArguments;
+import ac.grim.grimac.platform.api.manager.cloud.CloudPlatformCommandArguments;
 import ac.grim.grimac.platform.api.manager.ItemResetHandler;
 import ac.grim.grimac.platform.api.manager.MessagePlaceHolderManager;
 import ac.grim.grimac.platform.api.manager.PermissionRegistrationManager;
@@ -136,6 +136,10 @@ public abstract class AbstractGrimACForgeLoaderPlugin<
 
     public ForgeMessageUtil getForgeMessageUtils() {
         return forgeMessageUtil;
+    }
+
+    public ForgeConversionUtil getForgeConversionUtil() {
+        return forgeConversionUtil;
     }
 
     @SuppressWarnings("unchecked")

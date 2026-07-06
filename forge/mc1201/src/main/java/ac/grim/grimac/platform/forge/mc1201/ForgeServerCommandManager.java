@@ -1,10 +1,10 @@
 package ac.grim.grimac.platform.forge.mc1201;
 
+import ac.grim.grimac.platform.api.sender.Sender;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.tree.CommandNode;
-import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -16,28 +16,22 @@ import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.internal.CommandRegistrationHandler;
 import org.jetbrains.annotations.NotNull;
 
-public class ForgeServerCommandManager extends CommandManager<CommandSourceStack> {
+public class ForgeServerCommandManager extends CommandManager<Sender> {
 
     public ForgeServerCommandManager(
-            @NotNull ExecutionCoordinator<CommandSourceStack> executionCoordinator,
-            @NotNull SenderMapper<CommandSourceStack, ?> senderMapper
+            @NotNull ExecutionCoordinator<Sender> executionCoordinator,
+            @NotNull SenderMapper<Sender, ?> senderMapper
     ) {
-        super(executionCoordinator, new CommandRegistrationHandler<>() {
-            @Override
-            public void register(org.incendo.cloud.@NotNull Command<CommandSourceStack> command) {
-            }
-        });
+        super(executionCoordinator, CommandRegistrationHandler.nullCommandRegistrationHandler());
         MinecraftForge.EVENT_BUS.register(this);
     }
 
     @SubscribeEvent
     public void onRegisterCommands(RegisterCommandsEvent event) {
         CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
-        CommandBuildContext buildContext = event.getBuildContext();
 
-        // Build the command tree from Cloud's command tree and register with Brigadier
-        org.incendo.cloud.internal.CommandNode<CommandSourceStack> rootNode = this.commandTree().getRootNode();
-        for (org.incendo.cloud.internal.CommandNode<CommandSourceStack> child : rootNode.children()) {
+        org.incendo.cloud.internal.CommandNode<Sender> rootNode = this.commandTree().getRootNode();
+        for (org.incendo.cloud.internal.CommandNode<Sender> child : rootNode.children()) {
             CommandNode<CommandSourceStack> brigadierNode = buildBrigadierNode(child);
             if (brigadierNode != null) {
                 dispatcher.getRoot().addChild(brigadierNode);
@@ -47,9 +41,9 @@ public class ForgeServerCommandManager extends CommandManager<CommandSourceStack
 
     @SuppressWarnings("unchecked")
     private CommandNode<CommandSourceStack> buildBrigadierNode(
-            org.incendo.cloud.internal.CommandNode<CommandSourceStack> cloudNode
+            org.incendo.cloud.internal.CommandNode<Sender> cloudNode
     ) {
-        CommandComponent<CommandSourceStack> component = cloudNode.component();
+        CommandComponent<Sender> component = cloudNode.component();
         if (component == null) return null;
 
         CommandNode<CommandSourceStack> brigadierNode;
@@ -59,11 +53,11 @@ public class ForgeServerCommandManager extends CommandManager<CommandSourceStack
                 LiteralArgumentBuilder<CommandSourceStack> builder = LiteralArgumentBuilder.literal(component.name());
                 if (cloudNode.command() != null) {
                     builder.executes(context -> {
-                        cloudNode.command().execute(context.getSource());
+                        cloudNode.command().execute((Sender) context.getSource());
                         return 1;
                     });
                 }
-                for (org.incendo.cloud.internal.CommandNode<CommandSourceStack> child : cloudNode.children()) {
+                for (org.incendo.cloud.internal.CommandNode<Sender> child : cloudNode.children()) {
                     CommandNode<CommandSourceStack> childNode = buildBrigadierNode(child);
                     if (childNode != null) {
                         builder.then(childNode);
@@ -76,11 +70,11 @@ public class ForgeServerCommandManager extends CommandManager<CommandSourceStack
                         RequiredArgumentBuilder.argument(component.name(), component.argumentType());
                 if (cloudNode.command() != null) {
                     builder.executes(context -> {
-                        cloudNode.command().execute(context.getSource());
+                        cloudNode.command().execute((Sender) context.getSource());
                         return 1;
                     });
                 }
-                for (org.incendo.cloud.internal.CommandNode<CommandSourceStack> child : cloudNode.children()) {
+                for (org.incendo.cloud.internal.CommandNode<Sender> child : cloudNode.children()) {
                     CommandNode<CommandSourceStack> childNode = buildBrigadierNode(child);
                     if (childNode != null) {
                         builder.then(childNode);
@@ -94,5 +88,10 @@ public class ForgeServerCommandManager extends CommandManager<CommandSourceStack
         }
 
         return brigadierNode;
+    }
+
+    @Override
+    public boolean hasPermission(Sender sender, String permission) {
+        return sender.hasPermission(permission);
     }
 }

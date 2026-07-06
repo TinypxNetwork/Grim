@@ -17,8 +17,7 @@ dependencies {
     compileOnly(project(":common"))
     implementation(project(":forge:shared"))
     compileOnly(libs.packetevents.api)
-    compileOnly(libs.packetevents.forge)
-    compileOnly(libs.placeholderapi.forge)
+    compileOnly(libs.cloud.minecraft.modded)
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
 }
 

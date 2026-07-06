@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BooleanSupplier;
 
 public class ForgePlatformScheduler implements PlatformScheduler {
     private final ForgeAsyncScheduler asyncScheduler;
@@ -72,8 +73,29 @@ public class ForgePlatformScheduler implements PlatformScheduler {
         List<Runnable> cancellationTasks = new ArrayList<>(taskMap.values());
         taskMap.clear();
         for (Runnable cancellationTask : cancellationTasks) {
-            cancellationTask.run();
+            if (cancellationTask != null) {
+                cancellationTask.run();
+            }
         }
+    }
+
+    protected static TaskHandle createTaskHandle(boolean sync, BooleanSupplier cancelled, Runnable cancel) {
+        return new TaskHandle() {
+            @Override
+            public boolean isSync() {
+                return sync;
+            }
+
+            @Override
+            public boolean isCancelled() {
+                return cancelled.getAsBoolean();
+            }
+
+            @Override
+            public void cancel() {
+                cancel.run();
+            }
+        };
     }
 
     @Override

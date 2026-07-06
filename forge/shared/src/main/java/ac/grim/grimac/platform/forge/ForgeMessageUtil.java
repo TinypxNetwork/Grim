@@ -11,6 +11,7 @@ public class ForgeMessageUtil {
     }
 
     public void sendMessage(Sender target, Object message, boolean overlay) {
-        ((CommandSourceStack) (Object) target).sendSuccess((Component) message, overlay);
+        CommandSourceStack source = (CommandSourceStack) target.getNativeSender();
+        source.sendSuccess(() -> (Component) message, overlay);
     }
 }

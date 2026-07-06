@@ -8,7 +8,6 @@ import ac.grim.grimac.platform.forge.ForgeServerEvents;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 
 public class ForgeGlobalRegionScheduler implements GlobalRegionScheduler {
     private final ConcurrentHashMap<ForgePlatformScheduler.ScheduledTask, Runnable> tasks = new ConcurrentHashMap<>();
@@ -18,33 +17,43 @@ public class ForgeGlobalRegionScheduler implements GlobalRegionScheduler {
     }
 
     @Override
-    public TaskHandle run(@NotNull GrimPlugin plugin, @NotNull Consumer<Object> task) {
+    public void execute(@NotNull GrimPlugin plugin, @NotNull Runnable task) {
+        run(plugin, task);
+    }
+
+    @Override
+    public TaskHandle run(@NotNull GrimPlugin plugin, @NotNull Runnable task) {
         long tick = AbstractGrimACForgeLoaderPlugin.FORGE_SERVER.getTickCount();
         ForgePlatformScheduler.ScheduledTask scheduledTask = new ForgePlatformScheduler.ScheduledTask(
-                task::accept, tick, 0, false, plugin
+                task, tick, 0, false, plugin
         );
-        tasks.put(scheduledTask, null);
-        return () -> tasks.remove(scheduledTask);
+        tasks.put(scheduledTask, () -> tasks.remove(scheduledTask));
+        return ForgePlatformScheduler.createTaskHandle(true, () -> !tasks.containsKey(scheduledTask), () -> tasks.remove(scheduledTask));
     }
 
     @Override
-    public TaskHandle runDelayed(@NotNull GrimPlugin plugin, @NotNull Consumer<Object> task, long delay) {
+    public TaskHandle runDelayed(@NotNull GrimPlugin plugin, @NotNull Runnable task, long delay) {
         long tick = AbstractGrimACForgeLoaderPlugin.FORGE_SERVER.getTickCount() + delay;
         ForgePlatformScheduler.ScheduledTask scheduledTask = new ForgePlatformScheduler.ScheduledTask(
-                task::accept, tick, 0, false, plugin
+                task, tick, 0, false, plugin
         );
-        tasks.put(scheduledTask, null);
-        return () -> tasks.remove(scheduledTask);
+        tasks.put(scheduledTask, () -> tasks.remove(scheduledTask));
+        return ForgePlatformScheduler.createTaskHandle(true, () -> !tasks.containsKey(scheduledTask), () -> tasks.remove(scheduledTask));
     }
 
     @Override
-    public TaskHandle runAtFixedRate(@NotNull GrimPlugin plugin, @NotNull Consumer<Object> task, long initialDelay, long period) {
+    public TaskHandle runAtFixedRate(@NotNull GrimPlugin plugin, @NotNull Runnable task, long initialDelay, long period) {
         long tick = AbstractGrimACForgeLoaderPlugin.FORGE_SERVER.getTickCount() + initialDelay;
         ForgePlatformScheduler.ScheduledTask scheduledTask = new ForgePlatformScheduler.ScheduledTask(
-                task::accept, tick, period, true, plugin
+                task, tick, period, true, plugin
         );
-        tasks.put(scheduledTask, null);
-        return () -> tasks.remove(scheduledTask);
+        tasks.put(scheduledTask, () -> tasks.remove(scheduledTask));
+        return ForgePlatformScheduler.createTaskHandle(true, () -> !tasks.containsKey(scheduledTask), () -> tasks.remove(scheduledTask));
+    }
+
+    @Override
+    public void cancel(@NotNull GrimPlugin plugin) {
+        ForgePlatformScheduler.cancelPluginTasks(tasks, plugin);
     }
 
     public void cancelAll() {

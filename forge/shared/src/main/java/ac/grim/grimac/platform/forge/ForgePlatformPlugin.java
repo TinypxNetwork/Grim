@@ -3,16 +3,16 @@ package ac.grim.grimac.platform.forge;
 import ac.grim.grimac.platform.api.PlatformPlugin;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import net.minecraftforge.fml.ModContainer;
+import net.minecraftforge.forgespi.language.IModInfo;
 
 import java.util.Objects;
 
 public class ForgePlatformPlugin implements PlatformPlugin {
-    private final @NotNull ModContainer modContainer;
+    private final @NotNull IModInfo modInfo;
 
     @Contract(pure = true)
-    public ForgePlatformPlugin(@NotNull ModContainer modContainer) {
-        this.modContainer = Objects.requireNonNull(modContainer);
+    public ForgePlatformPlugin(@NotNull IModInfo modInfo) {
+        this.modInfo = Objects.requireNonNull(modInfo);
     }
 
     @Override
@@ -22,11 +22,11 @@ public class ForgePlatformPlugin implements PlatformPlugin {
 
     @Override
     public String getName() {
-        return modContainer.getModId();
+        return modInfo.getModId();
     }
 
     @Override
     public String getVersion() {
-        return modContainer.getModInfo().getVersion().toString();
+        return modInfo.getVersion().toString();
     }
 }

@@ -22,6 +22,10 @@ public class BadPacketsF extends Check implements PacketCheck {
 
     @Override
     public void onPacketReceive(PacketReceiveEvent event) {
+        if (player.getExternalMovementState().sprintSuppressedByMod()) {
+            exemptNext = true;
+        }
+
         if (event.getPacketType() == PacketType.Play.Client.ENTITY_ACTION) {
             WrapperPlayClientEntityAction packet = new WrapperPlayClientEntityAction(event);
 

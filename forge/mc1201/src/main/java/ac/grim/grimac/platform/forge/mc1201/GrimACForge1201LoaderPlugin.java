@@ -18,6 +18,7 @@ import ac.grim.grimac.platform.forge.sender.ForgeSenderFactory;
 import ac.grim.grimac.utils.lazy.LazyHolder;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.world.entity.Entity;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.SenderMapper;
 import org.incendo.cloud.execution.ExecutionCoordinator;
@@ -39,12 +40,12 @@ public class GrimACForge1201LoaderPlugin extends AbstractGrimACForgeLoaderPlugin
                 LazyHolder.simple(ForgeItemResetHandler::new),
                 LazyHolder.simple(GrimACForge1201LoaderPlugin::createCommandArguments),
                 LazyHolder.simple(() -> new ForgePermissionRegistrationManager(
-                        AbstractGrimACForgeLoaderPlugin.LOADER.getForgeSenderFactory(),
+                        (ForgeSenderFactory) AbstractGrimACForgeLoaderPlugin.LOADER.getForgeSenderFactory(),
                         name -> {}
                 )),
                 new ForgePlayerFactory(
                         Forge1201PlatformPlayer::new,
-                        ForgeGrimEntity::new,
+                        entity -> new ForgeGrimEntity((Entity) entity),
                         Forge1201PlatformInventory::new
                 ),
                 new Forge1201PlatformServer(),

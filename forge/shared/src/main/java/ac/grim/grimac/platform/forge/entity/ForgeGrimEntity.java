@@ -22,13 +22,8 @@ public class ForgeGrimEntity implements GrimEntity {
     }
 
     @Override
-    public boolean isAlive() {
-        return entity.isAlive();
-    }
-
-    @Override
     public boolean isDead() {
-        return entity.isDeadOrDying();
+        return !entity.isAlive();
     }
 
     @Override

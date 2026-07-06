@@ -17,6 +17,7 @@ import ac.grim.grimac.manager.DiscordManager;
 import ac.grim.grimac.manager.InitManager;
 import ac.grim.grimac.manager.SpectateManager;
 import ac.grim.grimac.manager.TickManager;
+import ac.grim.grimac.manager.compat.ExternalMovementStateManager;
 import ac.grim.grimac.manager.config.BaseConfigManager;
 import ac.grim.grimac.manager.datastore.DataStoreLifecycle;
 import ac.grim.grimac.manager.init.Initable;
@@ -48,6 +49,7 @@ public final class GrimAPI {
     private final DiscordManager discordManager;
     private final PlayerDataManager playerDataManager;
     private final TickManager tickManager;
+    private final ExternalMovementStateManager externalMovementStateManager;
     private final GrimExtensionManager extensionManager;
     private final EventBus eventBus;
     private final GrimExternalAPI externalAPI;
@@ -64,6 +66,7 @@ public final class GrimAPI {
         this.discordManager = new DiscordManager();
         this.playerDataManager = new PlayerDataManager();
         this.tickManager = new TickManager();
+        this.externalMovementStateManager = new ExternalMovementStateManager();
         this.extensionManager = new GrimExtensionManager();
         this.eventBus = new OptimizedEventBus(extensionManager);
         this.externalAPI = new GrimExternalAPI(this);
@@ -139,6 +142,10 @@ public final class GrimAPI {
 
     public @NotNull MessagePlaceHolderManager getMessagePlaceHolderManager() {
         return loader.getMessagePlaceHolderManager();
+    }
+
+    public ExternalMovementStateManager getExternalMovementStateManager() {
+        return externalMovementStateManager;
     }
 
     public CommandService getCommandService() {

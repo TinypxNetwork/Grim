@@ -17,7 +17,7 @@ public class Forge1201PlatformPlayer extends AbstractForgePlatformPlayer {
 
     @Override
     public Sender getSender() {
-        return AbstractGrimACForgeLoaderPlugin.LOADER.getForgeSenderFactory().wrap(
+        return ((ac.grim.grimac.platform.forge.sender.ForgeSenderFactory) AbstractGrimACForgeLoaderPlugin.LOADER.getForgeSenderFactory()).wrap(
                 serverPlayer().createCommandSourceStack()
         );
     }

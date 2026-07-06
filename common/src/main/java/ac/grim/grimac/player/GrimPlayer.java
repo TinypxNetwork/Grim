@@ -14,6 +14,7 @@ import ac.grim.grimac.checks.impl.packetorder.PacketOrderProcessor;
 import ac.grim.grimac.events.packets.CheckManagerListener;
 import ac.grim.grimac.events.packets.PacketEntityReplication;
 import ac.grim.grimac.manager.*;
+import ac.grim.grimac.manager.compat.ExternalMovementState;
 import ac.grim.grimac.manager.player.features.FeatureManagerImpl;
 import ac.grim.grimac.manager.player.handlers.DefaultResyncHandler;
 import ac.grim.grimac.manager.player.handlers.NoOpResyncHandler;
@@ -1116,6 +1117,10 @@ public class GrimPlayer implements GrimUser {
         if (!this.inVehicle()) return !this.isFlying;
         PacketEntity vehicle = getVehicle();
         return !(vehicle instanceof PacketEntityNautilus);
+    }
+
+    public ExternalMovementState getExternalMovementState() {
+        return GrimAPI.INSTANCE.getExternalMovementStateManager().getState(this);
     }
 
 }

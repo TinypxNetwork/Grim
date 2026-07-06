@@ -15,12 +15,12 @@ public class Forge1201PlatformServer extends AbstractForgePlatformServer {
 
     @Override
     public boolean hasPermission(Sender sender, int level) {
-        return ((CommandSourceStack) (Object) sender).hasPermission(level);
+        return ((CommandSourceStack) sender.getNativeSender()).hasPermission(level);
     }
 
     @Override
     public void dispatchCommand(Sender sender, String command) {
-        CommandSourceStack commandSource = (CommandSourceStack) (Object) sender;
+        CommandSourceStack commandSource = (CommandSourceStack) sender.getNativeSender();
         AbstractGrimACForgeLoaderPlugin.FORGE_SERVER.getCommands().performPrefixedCommand(commandSource, command);
     }
 

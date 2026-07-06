@@ -1,7 +1,7 @@
 package ac.grim.grimac.platform.forge.manager;
 
 import ac.grim.grimac.platform.api.command.PlayerSelector;
-import ac.grim.grimac.platform.api.manager.cloud.CloudPlatformCommandArguments;
+import ac.grim.grimac.platform.api.manager.CloudPlatformCommandArguments;
 import ac.grim.grimac.platform.api.sender.Sender;
 import ac.grim.grimac.platform.forge.AbstractGrimACForgeLoaderPlugin;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,6 @@ import org.incendo.cloud.suggestion.Suggestion;
 import org.incendo.cloud.suggestion.SuggestionProvider;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -38,15 +37,12 @@ public class ForgeCloudPlatformCommandArguments implements CloudPlatformCommandA
     }
 
     @Override
-    public SuggestionProvider<Sender> onlinePlayerSuggestions() {
+    public SuggestionProvider<Sender> getPlayerSuggestions() {
         return (context, input) -> {
-            Collection<ServerPlayer> players = AbstractGrimACForgeLoaderPlugin.FORGE_SERVER.getPlayerList().getPlayers();
-            List<Suggestion> suggestions = new ArrayList<>(players.size());
-
-            for (ServerPlayer player : players) {
+            List<Suggestion> suggestions = new ArrayList<>();
+            for (ServerPlayer player : AbstractGrimACForgeLoaderPlugin.FORGE_SERVER.getPlayerList().getPlayers()) {
                 suggestions.add(Suggestion.suggestion(player.getGameProfile().getName()));
             }
-
             return CompletableFuture.completedFuture(suggestions);
         };
     }

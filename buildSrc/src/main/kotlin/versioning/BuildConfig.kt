@@ -1,7 +1,6 @@
 package versioning
 
 import org.gradle.api.Project
-import org.gradle.internal.extensions.stdlib.toDefaultLowerCase
 import versioning.BuildConfig.init
 import versioning.BuildConfig.mavenLocalOverride
 import versioning.BuildConfig.release
@@ -66,9 +65,9 @@ object BuildConfig {
             ?: System.getenv(key.uppercase())        // 3. ENV   (KEY=value)
 
     private fun resolveBool(project: Project, key: String, altKey: String? = null, default: Boolean): Boolean {
-        return resolveRaw(project, key)?.toDefaultLowerCase()?.toBooleanStrictOrNull()
+        return resolveRaw(project, key)?.lowercase()?.toBooleanStrictOrNull()
             ?: altKey?.let {
-                resolveRaw(project, it)?.toDefaultLowerCase()?.toBooleanStrictOrNull()
+                resolveRaw(project, it)?.lowercase()?.toBooleanStrictOrNull()
             } ?: default
     }
 

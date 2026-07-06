@@ -18,6 +18,8 @@ public class SprintB extends Check implements PostPredictionCheck {
 
     @Override
     public void onPredictionComplete(final PredictionComplete predictionComplete) {
+        if (player.getExternalMovementState().taczCrawling()) return;
+
         if (player.isSlowMovement && player.sneakingSpeedMultiplier < 0.8f && predictionComplete.isChecked()) {
             ClientVersion version = player.getClientVersion();
 

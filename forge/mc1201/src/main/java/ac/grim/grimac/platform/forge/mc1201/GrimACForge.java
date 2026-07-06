@@ -4,8 +4,9 @@ import ac.grim.grimac.GrimAPI;
 import ac.grim.grimac.platform.forge.*;
 import ac.grim.grimac.platform.forge.initables.ForgeLuckPermsInitable;
 import ac.grim.grimac.platform.forge.initables.ForgePlaceholderAPIInitable;
+import ac.grim.grimac.platform.forge.mc1201.compat.ForgeTaczExternalMovementStateProvider;
 import ac.grim.grimac.platform.forge.scheduler.ForgePlatformScheduler;
-import com.github.retrooper.packetevents.PacketEvents;
+import ac.grim.grimac.utils.anticheat.LogUtil;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.server.ServerAboutToStartEvent;
@@ -30,8 +31,17 @@ public class GrimACForge {
         );
 
         GrimAPI.INSTANCE.getCommandService().registerCommands();
+        registerTaczCompatibility();
 
         MinecraftForge.EVENT_BUS.register(this);
+    }
+
+    private void registerTaczCompatibility() {
+        try {
+            GrimAPI.INSTANCE.getExternalMovementStateManager().setProvider(new ForgeTaczExternalMovementStateProvider());
+        } catch (IllegalStateException e) {
+            LogUtil.warn("TACZ is declared as a required dependency, but Grim could not initialize TACZ compatibility: " + e.getMessage());
+        }
     }
 
     @Mod.EventBusSubscriber(modid = "grimac", bus = Mod.EventBusSubscriber.Bus.FORGE)

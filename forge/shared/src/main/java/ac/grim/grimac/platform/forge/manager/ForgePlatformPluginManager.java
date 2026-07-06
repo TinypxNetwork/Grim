@@ -3,26 +3,27 @@ package ac.grim.grimac.platform.forge.manager;
 import ac.grim.grimac.platform.api.PlatformPlugin;
 import ac.grim.grimac.platform.api.manager.PlatformPluginManager;
 import ac.grim.grimac.platform.forge.ForgePlatformPlugin;
+import net.minecraftforge.forgespi.language.IModInfo;
 import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.ModContainer;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 public class ForgePlatformPluginManager implements PlatformPluginManager {
 
     @Override
-    public List<PlatformPlugin> getPluginList() {
-        List<PlatformPlugin> plugins = new ArrayList<>();
-        for (ModContainer mod : ModList.get().getMods()) {
-            plugins.add(new ForgePlatformPlugin(mod));
+    public PlatformPlugin[] getPlugins() {
+        PlatformPlugin[] plugins = new PlatformPlugin[ModList.get().getMods().size()];
+        int index = 0;
+        for (IModInfo mod : ModList.get().getMods()) {
+            plugins[index++] = new ForgePlatformPlugin(mod);
         }
         return plugins;
     }
 
     @Override
-    public boolean isPluginEnabled(String pluginName) {
-        return ModList.get().isLoaded(pluginName);
+    public PlatformPlugin getPlugin(String pluginName) {
+        return ModList.get().getMods().stream()
+                .filter(mod -> mod.getModId().equals(pluginName))
+                .findFirst()
+                .map(ForgePlatformPlugin::new)
+                .orElse(null);
     }
 }

@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 
 public final class ForgeResolverRegistrar {
 
-    private final Map<ModContainer, GrimPlugin> modContainerCache = new ConcurrentHashMap<>();
+    private final Map<String, GrimPlugin> modContainerCache = new ConcurrentHashMap<>();
     private final Map<Class<?>, GrimPlugin> classCache = new ConcurrentHashMap<>();
 
     public void registerAll(GrimExtensionManager extensionManager) {
@@ -31,27 +31,27 @@ public final class ForgeResolverRegistrar {
         extensionManager.registerResolver(this::resolveClass);
     }
 
-    private GrimPlugin resolveMod(ModContainer modContainer) {
-        return modContainerCache.computeIfAbsent(modContainer, container -> {
-            IModInfo metadata = container.getModInfo();
-            String folderName = metadata.getModId().equals("grimac") ? metadata.getDisplayName() : metadata.getModId();
+    private GrimPlugin resolveMod(IModInfo modInfo) {
+        return modContainerCache.computeIfAbsent(modInfo.getModId(), modId -> {
+            String folderName = modId.equals("grimac") ? modInfo.getDisplayName() : modId;
             return new BasicGrimPlugin(
-                    Logger.getLogger(metadata.getDisplayName()),
+                    Logger.getLogger(modInfo.getDisplayName()),
                     new File("config", folderName),
-                    metadata.getVersion().toString(),
-                    metadata.getDescription(),
+                    modInfo.getVersion().toString(),
+                    modInfo.getDescription(),
                     Collections.emptyList()
             );
         });
     }
 
     private GrimPlugin resolveModContainer(Object context) {
-        return (context instanceof ModContainer mc) ? resolveMod(mc) : null;
+        return (context instanceof ModContainer mc) ? resolveMod(mc.getModInfo()) : null;
     }
 
     private GrimPlugin resolveStringId(Object context) {
         if (context instanceof String modId) {
             return ModList.get().getModContainerById(modId.toLowerCase(Locale.ROOT))
+                    .map(ModContainer::getModInfo)
                     .map(this::resolveMod)
                     .orElse(null);
         }
@@ -73,11 +73,11 @@ public final class ForgeResolverRegistrar {
             if (sourceUrl == null) return null;
             Path sourcePath = Paths.get(sourceUrl.toURI());
 
-            for (ModContainer modContainer : ModList.get().getMods()) {
-                Path modPath = modContainer.getModInfo().getOwningFile().getFile().getFilePath();
+            for (IModInfo modInfo : ModList.get().getMods()) {
+                Path modPath = modInfo.getOwningFile().getFile().getFilePath();
                 try {
                     if (Files.isSameFile(modPath, sourcePath)) {
-                        return resolveMod(modContainer);
+                        return resolveMod(modInfo);
                     }
                 } catch (IOException ignored) {
                 }

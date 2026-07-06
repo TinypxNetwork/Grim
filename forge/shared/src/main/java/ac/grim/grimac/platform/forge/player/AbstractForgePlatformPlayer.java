@@ -10,6 +10,7 @@ import ac.grim.grimac.platform.forge.ForgeConversionUtil;
 import ac.grim.grimac.platform.forge.entity.ForgeGrimEntity;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPluginMessage;
 import net.kyori.adventure.text.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -81,6 +82,11 @@ public abstract class AbstractForgePlatformPlayer extends ForgeGrimEntity implem
     @Override
     public UUID getUniqueId() {
         return serverPlayer().getUUID();
+    }
+
+    @Override
+    public Vector3d getPosition() {
+        return new Vector3d(serverPlayer().getX(), serverPlayer().getY(), serverPlayer().getZ());
     }
 
     @Override

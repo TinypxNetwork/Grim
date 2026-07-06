@@ -26,7 +26,7 @@ public abstract class ForgeCommandSourceStackMixin {
 
     @Unique
     private ForgeSenderFactory grim$factory() {
-        return AbstractGrimACForgeLoaderPlugin.LOADER.getForgeSenderFactory();
+        return (ForgeSenderFactory) AbstractGrimACForgeLoaderPlugin.LOADER.getForgeSenderFactory();
     }
 
     public UUID grim$getUniqueId() {
@@ -38,11 +38,11 @@ public abstract class ForgeCommandSourceStackMixin {
     }
 
     public void grim$sendMessage(String message) {
-        grim$factory().sendMessage(grim$self(), message);
+        grim$factory().sendNativeMessage(grim$self(), message);
     }
 
     public void grim$sendMessage(Component message) {
-        grim$factory().sendMessage(grim$self(), message);
+        grim$factory().sendNativeMessage(grim$self(), message);
     }
 
     public boolean grim$hasPermission(String permission) {
@@ -54,7 +54,7 @@ public abstract class ForgeCommandSourceStackMixin {
     }
 
     public void grim$performCommand(String commandLine) {
-        grim$factory().performCommand(grim$self(), commandLine);
+        grim$factory().performNativeCommand(grim$self(), commandLine);
     }
 
     public boolean grim$isConsole() {

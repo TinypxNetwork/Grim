@@ -3,7 +3,6 @@ package ac.grim.grimac.platform.forge.initables;
 import ac.grim.grimac.GrimAPI;
 import ac.grim.grimac.api.GrimUser;
 import ac.grim.grimac.player.GrimPlayer;
-import ac.grim.grimac.platform.forge.AbstractGrimACForgeLoaderPlugin;
 import me.clip.placeholderapi.forge.ForgePlaceholderExpansion;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;

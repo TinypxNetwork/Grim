@@ -24,6 +24,12 @@ public class NoSlow extends Check implements PostPredictionCheck {
     @Override
     public void onPredictionComplete(final PredictionComplete predictionComplete) {
         if (!predictionComplete.isChecked()) return;
+        if (player.getExternalMovementState().gunActionActive()) {
+            reward();
+            flaggedLastTick = false;
+            bestOffset = 1;
+            return;
+        }
 
         // If the player was using an item for certain, and their predicted velocity had a flipped item
         if (player.packetStateData.isSlowedByUsingItem()) {

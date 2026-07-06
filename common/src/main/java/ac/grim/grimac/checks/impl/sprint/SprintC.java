@@ -17,6 +17,11 @@ public class SprintC extends Check implements PostPredictionCheck {
 
     @Override
     public void onPredictionComplete(final PredictionComplete predictionComplete) {
+        if (player.getExternalMovementState().sprintSuppressedByMod()) {
+            flaggedLastTick = false;
+            return;
+        }
+
         if (player.packetStateData.isSlowedByUsingItem()) {
             ClientVersion version = player.getClientVersion();
 

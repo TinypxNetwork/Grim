@@ -3,26 +3,17 @@ package ac.grim.grimac.platform.forge.sender;
 import ac.grim.grimac.platform.api.sender.Sender;
 import ac.grim.grimac.platform.forge.AbstractForgePlatformServer;
 import ac.grim.grimac.platform.forge.AbstractGrimACForgeLoaderPlugin;
-import ac.grim.grimac.platform.forge.ForgeMessageUtil;
 import net.kyori.adventure.text.Component;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.rcon.RconConsoleSource;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
 import java.util.UUID;
 
 public class ForgeSenderFactory extends AbstractForgeSenderFactory<CommandSourceStack> {
 
     private final AbstractForgePlatformServer platformServer = (AbstractForgePlatformServer) AbstractGrimACForgeLoaderPlugin.LOADER.getPlatformServer();
-    private final ForgeMessageUtil forgeMessageUtils = AbstractGrimACForgeLoaderPlugin.LOADER.getForgeMessageUtils();
-
-    @Override
-    public @NotNull Sender wrap(@NotNull CommandSourceStack sender) {
-        return Objects.requireNonNull(sender, "sender");
-    }
 
     @Override
     public UUID getUniqueId(CommandSourceStack commandSource) {
@@ -43,14 +34,22 @@ public class ForgeSenderFactory extends AbstractForgeSenderFactory<CommandSource
 
     @Override
     protected void sendMessage(CommandSourceStack sender, String message) {
-        forgeMessageUtils.sendMessage((Sender) (Object) sender, forgeMessageUtils.textLiteral(message), false);
+        sender.sendSuccess(() -> net.minecraft.network.chat.Component.literal(message), false);
     }
 
     @Override
     protected void sendMessage(CommandSourceStack sender, Component message) {
         net.minecraft.network.chat.Component nativeText =
                 (net.minecraft.network.chat.Component) AbstractGrimACForgeLoaderPlugin.LOADER.getForgeConversionUtil().toNativeText(message);
-        forgeMessageUtils.sendMessage((Sender) (Object) sender, nativeText, false);
+        sender.sendSuccess(() -> nativeText, false);
+    }
+
+    public void sendNativeMessage(CommandSourceStack sender, String message) {
+        sendMessage(sender, message);
+    }
+
+    public void sendNativeMessage(CommandSourceStack sender, Component message) {
+        sendMessage(sender, message);
     }
 
     @Override
@@ -65,28 +64,27 @@ public class ForgeSenderFactory extends AbstractForgeSenderFactory<CommandSource
 
     @Override
     protected boolean isOperator(CommandSourceStack sender) {
-        return platformServer.hasPermission((Sender) (Object) sender, platformServer.getOperatorPermissionLevel());
+        return sender.hasPermission(platformServer.getOperatorPermissionLevel());
     }
 
     @Override
     protected void performCommand(CommandSourceStack sender, String command) {
-        platformServer.dispatchCommand((Sender) (Object) sender, command);
+        sender.getServer().getCommands().performPrefixedCommand(sender, command);
+    }
+
+    public void performNativeCommand(CommandSourceStack sender, String command) {
+        performCommand(sender, command);
     }
 
     @Override
     public boolean isConsole(CommandSourceStack sender) {
         return sender.source == sender.getServer()
                 || sender.source.getClass() == RconConsoleSource.class
-                || (sender.source == CommandSourceStack.NULL && sender.getTextName().isEmpty());
+                || (sender.getEntity() == null && sender.getTextName().isEmpty());
     }
 
     @Override
     public boolean isPlayer(CommandSourceStack sender) {
         return sender.getEntity() instanceof ServerPlayer;
-    }
-
-    @SuppressWarnings("unchecked")
-    public CommandSourceStack unwrap(Sender sender) {
-        return (CommandSourceStack) (Object) sender;
     }
 }

@@ -1,8 +1,9 @@
 package ac.grim.grimac.platform.forge.player;
 
 import ac.grim.grimac.platform.api.player.PlatformInventory;
+import ac.grim.grimac.platform.forge.AbstractGrimACForgeLoaderPlugin;
+import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.ItemStack;
 
 public class ForgePlatformInventory implements PlatformInventory {
     protected final ServerPlayer player;
@@ -12,27 +13,55 @@ public class ForgePlatformInventory implements PlatformInventory {
     }
 
     @Override
-    public Object getItemInHand() {
-        return player.getMainHandItem();
+    public ItemStack getItemInHand() {
+        return convert(player.getMainHandItem());
     }
 
     @Override
-    public Object getItemInOffHand() {
-        return player.getOffhandItem();
+    public ItemStack getItemInOffHand() {
+        return convert(player.getOffhandItem());
     }
 
     @Override
-    public Object getItem(int slot) {
-        return player.getInventory().getItem(slot);
+    public ItemStack getStack(int bukkitSlot, int vanillaSlot) {
+        return convert(player.getInventory().getItem(vanillaSlot));
     }
 
     @Override
-    public int getSize() {
-        return player.getInventory().getContainerSize();
+    public ItemStack getHelmet() {
+        return convert(player.getInventory().getArmor(3));
     }
 
     @Override
-    public boolean isHoldingItem() {
-        return !player.getMainHandItem().isEmpty();
+    public ItemStack getChestplate() {
+        return convert(player.getInventory().getArmor(2));
+    }
+
+    @Override
+    public ItemStack getLeggings() {
+        return convert(player.getInventory().getArmor(1));
+    }
+
+    @Override
+    public ItemStack getBoots() {
+        return convert(player.getInventory().getArmor(0));
+    }
+
+    @Override
+    public ItemStack[] getContents() {
+        ItemStack[] contents = new ItemStack[player.getInventory().getContainerSize()];
+        for (int slot = 0; slot < contents.length; slot++) {
+            contents[slot] = convert(player.getInventory().getItem(slot));
+        }
+        return contents;
+    }
+
+    @Override
+    public String getOpenInventoryKey() {
+        return player.containerMenu == player.inventoryMenu ? "minecraft:inventory" : player.containerMenu.getClass().getName();
+    }
+
+    protected ItemStack convert(net.minecraft.world.item.ItemStack stack) {
+        return AbstractGrimACForgeLoaderPlugin.LOADER.getForgeConversionUtil().fromForgeItemStack(stack);
     }
 }

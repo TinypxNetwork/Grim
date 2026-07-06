@@ -59,6 +59,8 @@ public class PacketOrderF extends Check implements PostPredictionCheck {
 
     @Override
     public void onPacketReceive(PacketReceiveEvent event) {
+        if (player.getExternalMovementState().sprintSuppressedByMod()) return;
+
         if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY
                 || event.getPacketType() == PacketType.Play.Client.ATTACK
                 || event.getPacketType() == PacketType.Play.Client.SPECTATE_ENTITY
