@@ -9,7 +9,8 @@ public enum Platform {
 
     FABRIC("fabric"),
     BUKKIT("bukkit"),
-    FOLIA("folia");
+    FOLIA("folia"),
+    FORGE("forge");
 
     @Getter private final String name;
 

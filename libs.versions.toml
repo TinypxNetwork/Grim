@@ -15,6 +15,7 @@ geyser-base-api = "1.0.2"
 grim-api = "1.6.0.8"
 packetevents = "2.13.1+8187e23-SNAPSHOT"
 placeholderapi = "2.11.6"
+placeholderapi-forge = "2.12.4-DEV-forge"
 viaversion = "5.9.0"
 luckperms = "5.5"
 
@@ -30,6 +31,8 @@ configuralize = "1.4.1" # :slim classifier is applied in build.gradle.kts
 # --- Build & Tooling ---
 fabric-loader = "0.16.14"
 fabric-loom = "1.15.5"
+forge = "47.3.0"
+forge-gradle = "6.0.+"
 lombok = "9.0.0"
 shadow = "9.3.0"
 spotless = "6.25.0"
@@ -47,6 +50,7 @@ cloud-processors-requirements = { group = "org.incendo", name = "cloud-processor
 # --- Minecraft Server APIs ---
 paper-api = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper-api" }
 placeholderapi = { group = "me.clip", name = "placeholderapi", version.ref = "placeholderapi" }
+placeholderapi-forge = { group = "me.clip", name = "placeholderapi-forge", version.ref = "placeholderapi-forge" }
 luckperms = { group = "net.luckperms", name = "api", version.ref = "luckperms" }
 
 # --- Minecraft-Specific Libraries ---
@@ -61,6 +65,7 @@ grim-fabric-internal = { group = "ac.grim.grimac", name = "grim-fabric-internal"
 packetevents-api = { group = "com.github.retrooper", name = "packetevents-api", version.ref = "packetevents" }
 packetevents-fabric = { group  = "com.github.retrooper", name = "packetevents-fabric", version.ref = "packetevents" }
 packetevents-fabric-common = { group = "com.github.retrooper", name = "packetevents-fabric-common", version.ref = "packetevents" }
+packetevents-forge = { group = "com.github.retrooper", name = "packetevents-forge", version.ref = "packetevents" }
 packetevents-spigot = { group = "com.github.retrooper", name = "packetevents-spigot", version.ref = "packetevents"}
 viaversion = { group = "com.viaversion", name = "viaversion", version.ref = "viaversion" }
 viabackwards = { group = "com.viaversion", name = "viabackwards", version.ref = "viaversion" }
@@ -93,6 +98,7 @@ cloud-api = ["cloud-core", "cloud-processors-requirements"]
 [plugins]
 fabric-loom-remap = { id = "net.fabricmc.fabric-loom-remap", version.ref = "fabric-loom" }
 fabric-loom-unobfuscated = { id = "net.fabricmc.fabric-loom", version.ref = "fabric-loom" }
+forge-gradle = { id = "net.minecraftforge.gradle", version.ref = "forge-gradle" }
 lombok = { id = "io.freefair.lombok", version.ref = "lombok" }
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }

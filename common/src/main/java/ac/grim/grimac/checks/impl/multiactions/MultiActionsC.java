@@ -1,9 +1,11 @@
 package ac.grim.grimac.checks.impl.multiactions;
 
+import ac.grim.grimac.GrimAPI;
 import ac.grim.grimac.api.storage.verbose.Verbose;
 import ac.grim.grimac.checks.Check;
 import ac.grim.grimac.checks.CheckData;
 import ac.grim.grimac.checks.type.PacketCheck;
+import ac.grim.grimac.platform.api.Platform;
 import ac.grim.grimac.player.GrimPlayer;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -37,6 +39,7 @@ public class MultiActionsC extends Check implements PacketCheck {
 
     @Override
     public void onPacketReceive(PacketReceiveEvent event) {
+        if (GrimAPI.INSTANCE.getPlatform() == Platform.FORGE) return;
         if (event.getPacketType() != PacketType.Play.Client.CLICK_WINDOW) return;
         if (player.serverOpenedInventoryThisTick) return;
 

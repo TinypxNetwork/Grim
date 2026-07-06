@@ -1,9 +1,8 @@
 package ac.grim.grimac.utils.reflection;
 
 import lombok.experimental.UtilityClass;
-import org.geysermc.api.Geyser;
-import org.geysermc.floodgate.api.FloodgateApi;
 
+import java.lang.reflect.Method;
 import java.util.UUID;
 
 @UtilityClass
@@ -12,8 +11,30 @@ public class GeyserUtil {
     private static final boolean floodgate = ReflectionUtils.hasClass("org.geysermc.floodgate.api.FloodgateApi");
     private static final boolean geyser = ReflectionUtils.hasClass("org.geysermc.api.Geyser");
 
+    private static final boolean FORGE = ReflectionUtils.hasClass("net.minecraftforge.fml.loading.FMLLoader");
+
     public static boolean isBedrockPlayer(UUID uuid) {
-        return floodgate && FloodgateApi.getInstance().isFloodgatePlayer(uuid)
-                || geyser && Geyser.api().isBedrockPlayer(uuid);
+        if (FORGE) return false;
+        if (floodgate) {
+            try {
+                Class<?> floodgateApiClass = Class.forName("org.geysermc.floodgate.api.FloodgateApi");
+                Method getInstance = floodgateApiClass.getMethod("getInstance");
+                Object instance = getInstance.invoke(null);
+                Method isFloodgatePlayer = instance.getClass().getMethod("isFloodgatePlayer", UUID.class);
+                return (Boolean) isFloodgatePlayer.invoke(instance, uuid);
+            } catch (Exception ignored) {
+            }
+        }
+        if (geyser) {
+            try {
+                Class<?> geyserClass = Class.forName("org.geysermc.api.Geyser");
+                Method api = geyserClass.getMethod("api");
+                Object apiInstance = api.invoke(null);
+                Method isBedrockPlayer = apiInstance.getClass().getMethod("isBedrockPlayer", UUID.class);
+                return (Boolean) isBedrockPlayer.invoke(apiInstance, uuid);
+            } catch (Exception ignored) {
+            }
+        }
+        return false;
     }
 }

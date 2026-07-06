@@ -1,0 +1,13 @@
+{
+    "required": true,
+    "minVersion": "0.8",
+    "package": "ac.grim.grimac.platform.forge.mixins",
+    "compatibilityLevel": "JAVA_17",
+    "mixins": [
+        "ForgeCommandSourceStackMixin",
+        "ForgeLevelMixin",
+        "ForgeLevelChunkMixin"
+    ],
+    "client": [],
+    "server": []
+}

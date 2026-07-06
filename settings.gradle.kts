@@ -38,7 +38,17 @@ pluginManagement {
             }
         }
 
+        // For the ForgeGradle plugin
+        maven {
+            name = "MinecraftForge"
+            url = uri("https://maven.minecraftforge.net/")
+        }
+
         gradlePluginPortal()
+    }
+
+    plugins {
+        id("net.minecraftforge.gradle") version "6.0.24"
     }
 }
 
@@ -76,6 +86,9 @@ rootProject.name = "grimac"
 include("common")
 include("bukkit")
 include("fabric")
+include("forge")
+include(":forge:shared")
+include(":forge:mc1201")
 include(":fabric:shared")
 include(":fabric:intermediary")
 include(":fabric:intermediary:mc1161")
