@@ -14,10 +14,19 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ForgeAsyncScheduler implements AsyncScheduler {
-    private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(4);
+    private static final AtomicInteger THREAD_COUNTER = new AtomicInteger(1);
+    private static final ThreadFactory DAEMON_FACTORY = r -> {
+        Thread t = new Thread(r, "grimac-async-" + THREAD_COUNTER.getAndIncrement());
+        t.setDaemon(true);
+        return t;
+    };
+
+    private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(4, DAEMON_FACTORY);
     private final ConcurrentMap<GrimPlugin, List<Future<?>>> pluginTasks = new ConcurrentHashMap<>();
 
     @Override

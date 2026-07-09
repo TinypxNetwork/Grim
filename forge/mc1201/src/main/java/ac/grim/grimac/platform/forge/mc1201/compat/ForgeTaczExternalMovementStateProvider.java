@@ -9,9 +9,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class ForgeTaczExternalMovementStateProvider implements ExternalMovementStateProvider {
     private final Method fromLivingEntity;
@@ -22,9 +24,16 @@ public final class ForgeTaczExternalMovementStateProvider implements ExternalMov
     private final Method getSynIsAiming;
     private final Method getDataHolder;
     private final Field isCrawling;
-    private boolean warned;
+    private final AtomicBoolean warned = new AtomicBoolean(false);
 
-    private final Map<UUID, CachedState> playerCache = new ConcurrentHashMap<>();
+    private final Map<UUID, CachedState> playerCache = Collections.synchronizedMap(
+            new LinkedHashMap<>(64, 0.75f, true) {
+                @Override
+                protected boolean removeEldestEntry(Map.Entry<UUID, CachedState> eldest) {
+                    return size() > 200;
+                }
+            }
+    );
 
     public ForgeTaczExternalMovementStateProvider() {
         try {
@@ -92,8 +101,7 @@ public final class ForgeTaczExternalMovementStateProvider implements ExternalMov
     }
 
     private void warnOnce(Exception e) {
-        if (warned) return;
-        warned = true;
+        if (warned.getAndSet(true)) return;
         LogUtil.warn("Failed to read TACZ movement state; TACZ compatibility will be inactive. " + e.getMessage());
     }
 

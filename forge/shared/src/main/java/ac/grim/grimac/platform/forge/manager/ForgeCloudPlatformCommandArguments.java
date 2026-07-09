@@ -1,7 +1,7 @@
 package ac.grim.grimac.platform.forge.manager;
 
 import ac.grim.grimac.platform.api.command.PlayerSelector;
-import ac.grim.grimac.platform.api.manager.CloudPlatformCommandArguments;
+import ac.grim.grimac.platform.api.manager.cloud.CloudPlatformCommandArguments;
 import ac.grim.grimac.platform.api.sender.Sender;
 import ac.grim.grimac.platform.forge.AbstractGrimACForgeLoaderPlugin;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +37,7 @@ public class ForgeCloudPlatformCommandArguments implements CloudPlatformCommandA
     }
 
     @Override
-    public SuggestionProvider<Sender> getPlayerSuggestions() {
+    public SuggestionProvider<Sender> onlinePlayerSuggestions() {
         return (context, input) -> {
             List<Suggestion> suggestions = new ArrayList<>();
             for (ServerPlayer player : AbstractGrimACForgeLoaderPlugin.FORGE_SERVER.getPlayerList().getPlayers()) {

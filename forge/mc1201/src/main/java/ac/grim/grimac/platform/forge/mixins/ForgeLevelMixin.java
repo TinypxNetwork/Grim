@@ -2,6 +2,7 @@ package ac.grim.grimac.platform.forge.mixins;
 
 import ac.grim.grimac.platform.api.world.PlatformChunk;
 import ac.grim.grimac.platform.api.world.PlatformWorld;
+import ac.grim.grimac.platform.forge.AbstractGrimACForgeLoaderPlugin;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
@@ -43,6 +44,6 @@ abstract class ForgeLevelMixin implements LevelAccessor {
     }
 
     public boolean grimac$isLoaded() {
-        return true;
+        return AbstractGrimACForgeLoaderPlugin.FORGE_SERVER.getLevel(this.dimension()) != null;
     }
 }

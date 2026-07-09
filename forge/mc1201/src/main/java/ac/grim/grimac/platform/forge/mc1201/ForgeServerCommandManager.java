@@ -53,7 +53,11 @@ public class ForgeServerCommandManager extends CommandManager<Sender> {
                 LiteralArgumentBuilder<CommandSourceStack> builder = LiteralArgumentBuilder.literal(component.name());
                 if (cloudNode.command() != null) {
                     builder.executes(context -> {
-                        cloudNode.command().execute((Sender) context.getSource());
+                        String input = context.getInput();
+                        if (input.startsWith("/")) {
+                            input = input.substring(1);
+                        }
+                        this.commandExecutor().executeCommand((Sender) context.getSource(), input);
                         return 1;
                     });
                 }
@@ -70,7 +74,11 @@ public class ForgeServerCommandManager extends CommandManager<Sender> {
                         RequiredArgumentBuilder.argument(component.name(), component.argumentType());
                 if (cloudNode.command() != null) {
                     builder.executes(context -> {
-                        cloudNode.command().execute((Sender) context.getSource());
+                        String input = context.getInput();
+                        if (input.startsWith("/")) {
+                            input = input.substring(1);
+                        }
+                        this.commandExecutor().executeCommand((Sender) context.getSource(), input);
                         return 1;
                     });
                 }

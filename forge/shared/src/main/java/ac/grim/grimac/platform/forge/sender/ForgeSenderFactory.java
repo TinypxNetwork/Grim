@@ -54,12 +54,12 @@ public class ForgeSenderFactory extends AbstractForgeSenderFactory<CommandSource
 
     @Override
     protected @Nullable Boolean queryPermissionValue(CommandSourceStack sender, String node) {
-        return sender.hasPermission(2) ? true : null;
+        return null;
     }
 
     @Override
     protected boolean queryPermission(CommandSourceStack sender, String node, boolean defaultIfUnset) {
-        return sender.hasPermission(2);
+        return defaultIfUnset;
     }
 
     @Override

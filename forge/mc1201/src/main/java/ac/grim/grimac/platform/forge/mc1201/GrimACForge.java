@@ -12,6 +12,7 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod("grimac")
@@ -37,10 +38,11 @@ public class GrimACForge {
     }
 
     private void registerTaczCompatibility() {
+        if (!ModList.get().isLoaded("tacz")) return;
         try {
             GrimAPI.INSTANCE.getExternalMovementStateManager().setProvider(new ForgeTaczExternalMovementStateProvider());
         } catch (IllegalStateException e) {
-            LogUtil.warn("TACZ is declared as a required dependency, but Grim could not initialize TACZ compatibility: " + e.getMessage());
+            LogUtil.warn("TACZ is present but Grim could not initialize TACZ compatibility: " + e.getMessage());
         }
     }
 

@@ -76,6 +76,8 @@ public class ForgeGrimEntity implements GrimEntity {
                     location.getY(),
                     location.getZ()
             );
+            entity.setYRot(location.getYaw());
+            entity.setXRot(location.getPitch());
             return true;
         });
     }

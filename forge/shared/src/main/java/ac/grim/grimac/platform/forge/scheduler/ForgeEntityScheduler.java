@@ -9,10 +9,19 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ForgeEntityScheduler implements EntityScheduler {
-    private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
+    private static final AtomicInteger THREAD_COUNTER = new AtomicInteger(1);
+    private static final ThreadFactory DAEMON_FACTORY = r -> {
+        Thread t = new Thread(r, "grimac-entity-" + THREAD_COUNTER.getAndIncrement());
+        t.setDaemon(true);
+        return t;
+    };
+
+    private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(2, DAEMON_FACTORY);
 
     @Override
     public void execute(@NotNull GrimEntity entity, @NotNull GrimPlugin plugin, @NotNull Runnable run, Runnable retired, long delay) {
